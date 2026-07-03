@@ -1,0 +1,22 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+.env
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Dart
+.dart_tool/
+pubspec.lock
+
+# Codemap output (generated, not source)
+.codemap/
+.graphify/

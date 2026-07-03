@@ -1,0 +1,4 @@
+networkx>=3.0
+leidenalg>=0.10.0
+pyyaml>=6.0
+mcp>=1.0.0

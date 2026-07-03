@@ -1,0 +1,10 @@
+name: graphify_behavioral_extractor
+description: AST-based behavioral analysis for Dart codebases
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  analyzer: ^6.0.0
+  path: ^1.8.0

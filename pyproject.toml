@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "codemap"
+version = "1.0.0"
+description = "Knowledge graph generator for codebases — scan, analyze, and understand any project"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Atlax"}
+]
+keywords = ["codebase", "knowledge-graph", "static-analysis", "dead-code", "architecture"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "networkx>=3.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+full = [
+    "leidenalg>=0.10.0",
+    "mcp>=1.0.0",
+]
+mcp = [
+    "mcp>=1.0.0",
+]
+dev = [
+    "pytest>=7.0",
+]
+
+[project.scripts]
+codemap = "codemap.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/360integree/codemap"
+Repository = "https://github.com/360integree/codemap"
+Issues = "https://github.com/360integree/codemap/issues"
+
+[tool.setuptools.packages.find]
+include = ["codemap*"]
