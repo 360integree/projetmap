@@ -221,7 +221,9 @@ def export_html(graph_data: dict, output_path: Path) -> Path:
                             )
             member_data[t] = {"nodes": members, "edges": member_edges[:100]}
 
-    vis_js = '<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>'
+    vis_js = (
+        '<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>'
+    )
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
