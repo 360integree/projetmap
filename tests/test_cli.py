@@ -23,7 +23,7 @@ def test_cli_version():
     import importlib.metadata
 
     version = importlib.metadata.version("projetmap")
-    assert version == "1.0.0"
+    assert version == "1.0.1"
 
 
 def test_cli_scan_project(sample_project):
