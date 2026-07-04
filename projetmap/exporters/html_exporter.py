@@ -221,7 +221,7 @@ def export_html(graph_data: dict, output_path: Path) -> Path:
                             )
             member_data[t] = {"nodes": members, "edges": member_edges[:100]}
 
-    vis_js = Path("/tmp/vis-network.min.js").read_text()
+    vis_js = '<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>'
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -289,9 +289,7 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
   <div id="info-body"></div>
 </div>
 
-<script>
 {vis_js}
-</script>
 <script>
 const clusterNodes = {json.dumps(cluster_nodes)};
 const clusterEdges = {json.dumps(cluster_edges)};
