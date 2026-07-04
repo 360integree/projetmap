@@ -1,4 +1,4 @@
-"""Shared utility functions for codemap."""
+"""Shared utility functions for projetmap."""
 
 import os
 from pathlib import Path

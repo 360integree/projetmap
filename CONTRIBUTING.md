@@ -14,8 +14,8 @@ Thank you for your interest in contributing to Codemap! This document provides g
 1. **Fork the repository**
    ```bash
    # Fork on GitHub, then clone your fork
-   git clone https://github.com/YOUR_USERNAME/codemap.git
-   cd codemap
+   git clone https://github.com/YOUR_USERNAME/projetmap.git
+   cd projetmap
    ```
 
 2. **Create a virtual environment**
@@ -31,7 +31,7 @@ Thank you for your interest in contributing to Codemap! This document provides g
 
 4. **Verify installation**
    ```bash
-   codemap --help
+   projetmap --help
    pytest --version
    ruff --version
    ```
@@ -61,10 +61,10 @@ Thank you for your interest in contributing to Codemap! This document provides g
 3. **Run quality checks**
    ```bash
    # Linting
-   ruff check codemap/
+   ruff check projetmap/
    
    # Formatting
-   ruff format codemap/
+   ruff format projetmap/
    
    # Tests
    pytest
@@ -145,7 +145,7 @@ Include:
 Include:
 - Python version (`python --version`)
 - Operating system
-- Codemap version (`pip show codemap`)
+- Codemap version (`pip show projetmap`)
 - Steps to reproduce
 - Expected vs actual behavior
 - Error messages/logs
@@ -159,11 +159,11 @@ Include:
 
 ## Adding Language Support
 
-See `codemap/behavioral/SCHEMA.md` for the full contract.
+See `projetmap/behavioral/SCHEMA.md` for the full contract.
 
-1. Create `codemap/behavioral/extractors/<language>/`
+1. Create `projetmap/behavioral/extractors/<language>/`
 2. Implement an extractor outputting `behavioral_data.json`
-3. Register in `codemap/behavioral/extractors/__init__.py`
+3. Register in `projetmap/behavioral/extractors/__init__.py`
 4. Add tests in `tests/`
 
 ## Code of Conduct

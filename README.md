@@ -21,7 +21,7 @@ pip install projetmap
 
 ```bash
 git clone https://github.com/360integree/projetmap.git
-cd codemap
+cd projetmap
 pip install -e ".[full]"
 ```
 
@@ -193,7 +193,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ```bash
 git clone https://github.com/360integree/projetmap.git
-cd codemap
+cd projetmap
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev,full]"

@@ -386,7 +386,7 @@ def run_pipeline(
     ast_only: bool = False,
     filters: list = None,
 ) -> dict:
-    """Run the full codemap pipeline."""
+    """Run the full projetmap pipeline."""
     root = get_project_root(target)
     out = root / output_dir
     cache_dir = out / "cache"
@@ -787,7 +787,7 @@ def run_behavioral_analysis_pipeline(
     language = detect_language(root)
     if not language:
         print("  ⚠️  No behavioral extractor available for this project's language.")
-        print("     Supported: Dart (add more via codemap/behavioral/extractors/)")
+        print("     Supported: Dart (add more via projetmap/behavioral/extractors/)")
         return {}
 
     print(f"  📐 Running {language} behavioral extractor...")

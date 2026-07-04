@@ -12,7 +12,7 @@ A clear and concise description of what the bug is.
 
 ## Steps to Reproduce
 
-1. Run command `codemap ...`
+1. Run command `projetmap ...`
 2. With options `--flag`
 3. See error
 
