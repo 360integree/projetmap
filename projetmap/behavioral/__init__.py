@@ -1,8 +1,8 @@
 """Behavioral analysis: call graphs, state flow, dead code detection."""
 from typing import Dict
 
-from codemap.behavioral.call_graph import analyze_call_graph
-from codemap.behavioral.state_flow import analyze_state_flow
+from projetmap.behavioral.call_graph import analyze_call_graph
+from projetmap.behavioral.state_flow import analyze_state_flow
 
 
 def run_behavioral_analysis(graph_data: dict, behavioral_json_path: str) -> dict:

@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from codemap.extractors.base import BaseExtractor, Entity, ExtractionResult, Relationship
+from projetmap.extractors.base import BaseExtractor, Entity, ExtractionResult, Relationship
 
 
 class PythonExtractor(BaseExtractor):

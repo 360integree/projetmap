@@ -7,7 +7,7 @@ try:
 except ImportError:
     nx = None
 
-from codemap.extractors.base import Entity, ExtractionResult, Relationship
+from projetmap.extractors.base import Entity, ExtractionResult, Relationship
 
 
 class GraphBuilder:

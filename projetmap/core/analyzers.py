@@ -3,7 +3,7 @@
 import re
 from collections import defaultdict
 
-from codemap.extractors.base import Entity, Relationship
+from projetmap.extractors.base import Entity, Relationship
 
 
 class LayerViolationAnalyzer:

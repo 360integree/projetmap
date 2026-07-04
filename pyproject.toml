@@ -3,7 +3,7 @@ requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "codemap"
+name = "projetmap"
 version = "1.0.0"
 description = "Knowledge graph generator for codebases — scan, analyze, and understand any project"
 readme = "README.md"
@@ -46,7 +46,7 @@ dev = [
 ]
 
 [project.scripts]
-codemap = "codemap.cli:main"
+projetmap = "projetmap.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/360integree/codemap"
@@ -54,7 +54,7 @@ Repository = "https://github.com/360integree/codemap"
 Issues = "https://github.com/360integree/codemap/issues"
 
 [tool.setuptools.packages.find]
-include = ["codemap*"]
+include = ["projetmap*"]
 
 [tool.ruff]
 line-length = 100
@@ -65,7 +65,7 @@ select = ["E", "F", "I", "N", "W", "UP"]
 ignore = ["E501"]  # line length handled by formatter
 
 [tool.ruff.lint.isort]
-known-first-party = ["codemap"]
+known-first-party = ["projetmap"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

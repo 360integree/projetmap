@@ -6,19 +6,19 @@ Turns any folder of code, docs, and configs into a queryable knowledge graph.
 Outputs: graph.json, GRAPH_REPORT.md, graph.html, graph.mermaid
 
 Usage:
-    python -m codemap <path>                    # Full pipeline
-    python -m codemap <path> --report           # Just the report
-    python -m codemap <path> --json             # Just JSON
-    python -m codemap <path> --html             # Just interactive HTML
-    python -m codemap <path> --mermaid          # Just Mermaid diagram
-    python -m codemap <path> --refresh          # Force re-scan
-    python -m codemap <path> --query <entity>   # Query an entity
-    python -m codemap <path> --path A B         # Find path between entities
-    python -m codemap <path> --scan-dirs lib apps  # Scan specific dirs
-    python -m codemap <path> --analyze-prompts  # Analyze instruction files for redundancies
-    python -m codemap <path> --prompt-file <file>  # Analyze a specific prompt file
-    python -m codemap <path> --behavioral       # Behavioral analysis (call graph, state flow, dead code)
-    python -m codemap <path> --runtime-analysis # Universal runtime analysis
+    python -m projetmap <path>                    # Full pipeline
+    python -m projetmap <path> --report           # Just the report
+    python -m projetmap <path> --json             # Just JSON
+    python -m projetmap <path> --html             # Just interactive HTML
+    python -m projetmap <path> --mermaid          # Just Mermaid diagram
+    python -m projetmap <path> --refresh          # Force re-scan
+    python -m projetmap <path> --query <entity>   # Query an entity
+    python -m projetmap <path> --path A B         # Find path between entities
+    python -m projetmap <path> --scan-dirs lib apps  # Scan specific dirs
+    python -m projetmap <path> --analyze-prompts  # Analyze instruction files for redundancies
+    python -m projetmap <path> --prompt-file <file>  # Analyze a specific prompt file
+    python -m projetmap <path> --behavioral       # Behavioral analysis (call graph, state flow, dead code)
+    python -m projetmap <path> --runtime-analysis # Universal runtime analysis
 """
 
 import argparse
@@ -26,36 +26,36 @@ import json
 import os
 from pathlib import Path
 
-from codemap.core.cache import (
+from projetmap.core.cache import (
     get_cached_graph,
     get_changed_files,
     save_cache,
 )
-from codemap.core.community import (
+from projetmap.core.community import (
     _community_display_name,
     detect_communities,
     find_god_nodes,
     find_surprising_links,
 )
-from codemap.core.graph_builder import GraphBuilder
-from codemap.core.utils import collect_files, get_project_root, should_ignore
-from codemap.exporters.html_exporter import export_html
-from codemap.exporters.json_exporter import export_json
-from codemap.exporters.mermaid_exporter import export_mermaid
-from codemap.exporters.report_exporter import export_report
-from codemap.extractors import get_extractor
-from codemap.extractors.config_parser import parse_config
+from projetmap.core.graph_builder import GraphBuilder
+from projetmap.core.utils import collect_files, get_project_root, should_ignore
+from projetmap.exporters.html_exporter import export_html
+from projetmap.exporters.json_exporter import export_json
+from projetmap.exporters.mermaid_exporter import export_mermaid
+from projetmap.exporters.report_exporter import export_report
+from projetmap.extractors import get_extractor
+from projetmap.extractors.config_parser import parse_config
 
 # Instruction Pipeline (v3)
 try:
-    from codemap.instructions import InstructionGraphBuilder, PromptExtractor
+    from projetmap.instructions import InstructionGraphBuilder, PromptExtractor
     HAS_INSTRUCTION_PIPELINE = True
 except ImportError:
     HAS_INSTRUCTION_PIPELINE = False
 
 # Runtime Analyzers (v4)
 try:
-    from codemap.analyzers import (
+    from projetmap.analyzers import (
         ConfigScanner,
         ConventionDetector,
         EntryDetector,
@@ -66,7 +66,7 @@ except ImportError:
     HAS_RUNTIME_ANALYZERS = False
 
 
-OUTPUT_DIR = ".codemap"
+OUTPUT_DIR = ".projetmap"
 
 # File extensions that contain instruction/prompt content
 PROMPT_EXTENSIONS = {
@@ -422,7 +422,7 @@ def run_pipeline(
         if p.exists():
             config = parse_config(p)
             if config:
-                from codemap.extractors.base import Entity
+                from projetmap.extractors.base import Entity
                 builder.add_result(type('R', (), {
                     'entities': [Entity(
                         id=cf, type="config", name=config.get("name", cf),
@@ -490,7 +490,7 @@ def query_entity(target: str, entity_name: str, output_dir: str = OUTPUT_DIR):
     cached = get_cached_graph(out)
 
     if not cached:
-        print("❌ No cached graph found. Run codemap first.")
+        print("❌ No cached graph found. Run projetmap first.")
         return
 
     # Build a quick lookup
@@ -535,7 +535,7 @@ def find_path(target: str, source: str, dest: str, output_dir: str = OUTPUT_DIR)
     cached = get_cached_graph(out)
 
     if not cached:
-        print("❌ No cached graph found. Run codemap first.")
+        print("❌ No cached graph found. Run projetmap first.")
         return
 
     import networkx as nx
@@ -776,7 +776,7 @@ def run_behavioral_analysis_pipeline(
     output_dir: str = OUTPUT_DIR,
 ) -> dict:
     """Run behavioral analysis: language-specific extraction + Python analysis."""
-    from codemap.behavioral.extractors import detect_language, run_extractor
+    from projetmap.behavioral.extractors import detect_language, run_extractor
 
     root = get_project_root(target)
     out = root / output_dir
@@ -807,7 +807,7 @@ def run_behavioral_analysis_pipeline(
     # Step 2: Run Python behavioral analyzers
     print("  🔬 Running behavioral analyzers...")
     try:
-        from codemap.behavioral import run_behavioral_analysis
+        from projetmap.behavioral import run_behavioral_analysis
         results = run_behavioral_analysis(graph_data, tmp_path)
     except Exception as e:
         print(f"  ❌ Behavioral analysis failed: {e}")
@@ -1063,17 +1063,17 @@ def main():
     if args.json:
         print(json.dumps(graph_data, indent=2))
     elif args.report:
-        from codemap.exporters.report_exporter import export_report
+        from projetmap.exporters.report_exporter import export_report
         out = get_project_root(args.target) / args.output
         export_report(graph_data, out / "GRAPH_REPORT.md")
         print(f"📄 Report: {out}/GRAPH_REPORT.md")
     elif args.html:
-        from codemap.exporters.html_exporter import export_html
+        from projetmap.exporters.html_exporter import export_html
         out = get_project_root(args.target) / args.output
         export_html(graph_data, out / "graph.html")
         print(f"🌐 HTML: {out}/graph.html")
     elif args.mermaid:
-        from codemap.exporters.mermaid_exporter import export_mermaid
+        from projetmap.exporters.mermaid_exporter import export_mermaid
         out = get_project_root(args.target) / args.output
         export_mermaid(graph_data, out / "graph.mermaid")
         print(f"📐 Mermaid: {out}/graph.mermaid")

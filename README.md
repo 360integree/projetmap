@@ -1,8 +1,8 @@
-# 🗺️ Codemap
+# 🗺️ Projetmap
 
 **Knowledge graph generator for codebases.**
 
-[![PyPI version](https://badge.fury.io/py/codemap.svg)](https://pypi.org/project/codemap/)
+[![PyPI version](https://badge.fury.io/py/projetmap.svg)](https://pypi.org/project/projetmap/)
 [![Tests](https://github.com/360integree/codemap/actions/workflows/tests.yml/badge.svg)](https://github.com/360integree/codemap/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -14,7 +14,7 @@ Turns any folder of code, docs, and configs into a queryable knowledge graph. Un
 ### Install from PyPI
 
 ```bash
-pip install codemap
+pip install projetmap
 ```
 
 ### Or install from source
@@ -29,13 +29,13 @@ pip install -e ".[full]"
 
 ```bash
 # Basic structural analysis
-codemap /path/to/your/project
+projetmap /path/to/your/project
 
 # Or with Python module syntax
-python -m codemap /path/to/your/project
+python -m projetmap /path/to/your/project
 
 # With behavioral analysis (dead code, state flow, call graphs)
-codemap /path/to/your/project --behavioral
+projetmap /path/to/your/project --behavioral
 ```
 
 ## What It Does
@@ -63,27 +63,27 @@ codemap /path/to/your/project --behavioral
 ## CLI Reference
 
 ```bash
-codemap <path>                    # Full pipeline
-codemap <path> --refresh          # Force re-scan (ignore cache)
-codemap <path> --behavioral       # Include behavioral analysis
-codemap <path> --report           # Output only the Markdown report
-codemap <path> --json             # Output only graph.json
-codemap <path> --html             # Output only interactive HTML
-codemap <path> --mermaid          # Output only Mermaid diagram
-codemap <path> --query <entity>   # Query a specific entity
-codemap <path> --path A B         # Find path between entities
-codemap <path> --analyze-prompts  # Analyze instruction files
-codemap <path> --runtime-analysis # Runtime comprehension
-codemap <path> --scan-dirs lib    # Scan specific directories
-codemap <path> --ignore dist build  # Ignore patterns
+projetmap <path>                    # Full pipeline
+projetmap <path> --refresh          # Force re-scan (ignore cache)
+projetmap <path> --behavioral       # Include behavioral analysis
+projetmap <path> --report           # Output only the Markdown report
+projetmap <path> --json             # Output only graph.json
+projetmap <path> --html             # Output only interactive HTML
+projetmap <path> --mermaid          # Output only Mermaid diagram
+projetmap <path> --query <entity>   # Query a specific entity
+projetmap <path> --path A B         # Find path between entities
+projetmap <path> --analyze-prompts  # Analyze instruction files
+projetmap <path> --runtime-analysis # Runtime comprehension
+projetmap <path> --scan-dirs lib    # Scan specific directories
+projetmap <path> --ignore dist build  # Ignore patterns
 ```
 
 ## Output
 
-Results are saved to `.codemap/` in the target directory:
+Results are saved to `.projetmap/` in the target directory:
 
 ```
-.codemap/
+.projetmap/
 ├── graph.json                  # Full knowledge graph
 ├── GRAPH_REPORT.md             # Human-readable report
 ├── graph.html                  # Interactive vis.js visualization
@@ -98,7 +98,7 @@ Results are saved to `.codemap/` in the target directory:
 ## Architecture
 
 ```
-codemap/
+projetmap/
 ├── core/               # Graph building, community detection, caching
 ├── extractors/         # Structural extractors (per-language, regex-based)
 ├── behavioral/         # Behavioral analysis layer
@@ -114,11 +114,11 @@ codemap/
 
 ## Adding a Language Extractor
 
-See `codemap/behavioral/SCHEMA.md` for the full contract.
+See `projetmap/behavioral/SCHEMA.md` for the full contract.
 
-1. Create `codemap/behavioral/extractors/<language>/`
+1. Create `projetmap/behavioral/extractors/<language>/`
 2. Write an extractor that outputs `behavioral_data.json` matching the schema
-3. Register it in `codemap/behavioral/extractors/__init__.py`:
+3. Register it in `projetmap/behavioral/extractors/__init__.py`:
    ```python
    DETECTORS["python"] = (_detect_python, _run_python_extractor)
    ```
@@ -127,11 +127,11 @@ The Python analyzers (`call_graph.py`, `state_flow.py`) work automatically with 
 
 ## MCP Server (IDE Integration)
 
-Codemap includes an MCP server that AI agents in IDEs can call natively.
+Projetmap includes an MCP server that AI agents in IDEs can call natively.
 
 ```bash
 # Start the MCP server
-codemap mcp
+projetmap mcp
 ```
 
 ### IDE Configuration
@@ -140,8 +140,8 @@ codemap mcp
 ```json
 {
   "mcpServers": {
-    "codemap": {
-      "command": "codemap",
+    "projetmap": {
+      "command": "projetmap",
       "args": ["mcp"]
     }
   }
@@ -152,8 +152,8 @@ codemap mcp
 ```json
 {
   "mcpServers": {
-    "codemap": {
-      "command": "codemap",
+    "projetmap": {
+      "command": "projetmap",
       "args": ["mcp"]
     }
   }
@@ -164,8 +164,8 @@ codemap mcp
 ```json
 {
   "mcpServers": {
-    "codemap": {
-      "command": "codemap",
+    "projetmap": {
+      "command": "projetmap",
       "args": ["mcp"]
     }
   }
@@ -176,14 +176,14 @@ codemap mcp
 
 | Tool | Description |
 |------|-------------|
-| `codemap_scan` | Scan a project and build the knowledge graph |
-| `codemap_report` | Get the full Markdown report |
-| `codemap_query` | Query an entity by name (details + relationships) |
-| `codemap_path` | Find dependency path between two entities |
-| `codemap_dead_code` | List dead code (unreachable functions) |
-| `codemap_hotspots` | State mutation hotspots (risk assessment) |
-| `codemap_listeners` | Unpaired listener warnings (memory leaks) |
-| `codemap_god_nodes` | Most-connected modules (architectural bottlenecks) |
+| `projetmap_scan` | Scan a project and build the knowledge graph |
+| `projetmap_report` | Get the full Markdown report |
+| `projetmap_query` | Query an entity by name (details + relationships) |
+| `projetmap_path` | Find dependency path between two entities |
+| `projetmap_dead_code` | List dead code (unreachable functions) |
+| `projetmap_hotspots` | State mutation hotspots (risk assessment) |
+| `projetmap_listeners` | Unpaired listener warnings (memory leaks) |
+| `projetmap_god_nodes` | Most-connected modules (architectural bottlenecks) |
 
 ## Development
 

@@ -1,11 +1,11 @@
-"""Codemap MCP Server — Knowledge graph as a service for AI agents.
+"""Projetmap MCP Server — Knowledge graph as a service for AI agents.
 
-Exposes Codemap's codebase analysis capabilities as MCP tools that any
+Exposes Projetmap's codebase analysis capabilities as MCP tools that any
 IDE agent (Cursor, Windsurf, ZCode, Claude Desktop) can call natively.
 
 Usage:
-    python -m codemap mcp          # Start MCP server over stdio
-    python -m codemap mcp --help   # Show server options
+    python -m projetmap mcp          # Start MCP server over stdio
+    python -m projetmap mcp --help   # Show server options
 """
 import json
 from pathlib import Path
@@ -13,7 +13,7 @@ from pathlib import Path
 from mcp.server.fastmcp import FastMCP
 
 mcp = FastMCP(
-    "codemap",
+    "projetmap",
     instructions=(
         "Knowledge graph generator for codebases. "
         "Scan projects to get structural analysis, dead code detection, "
@@ -26,8 +26,8 @@ _graph_cache: dict = {}
 
 
 def _get_out_dir(path: str) -> Path:
-    """Get the .codemap output directory for a project."""
-    return Path(path) / ".codemap"
+    """Get the .projetmap output directory for a project."""
+    return Path(path) / ".projetmap"
 
 
 def _load_graph(path: str) -> dict | None:
@@ -60,7 +60,7 @@ def _load_behavioral(path: str) -> dict | None:
 
 
 @mcp.tool()
-def codemap_scan(path: str, refresh: bool = False, behavioral: bool = False) -> str:
+def projetmap_scan(path: str, refresh: bool = False, behavioral: bool = False) -> str:
     """Scan a codebase and build a knowledge graph.
 
     Run this first to initialize the graph for a project.
@@ -71,13 +71,13 @@ def codemap_scan(path: str, refresh: bool = False, behavioral: bool = False) -> 
         refresh: Force re-scan even if cache exists.
         behavioral: Also run behavioral analysis (dead code, state flow).
     """
-    from codemap.cli import run_behavioral_analysis_pipeline, run_pipeline
+    from projetmap.cli import run_behavioral_analysis_pipeline, run_pipeline
 
     try:
         graph_data = run_pipeline(
             target=path,
             refresh=refresh,
-            output_dir=".codemap",
+            output_dir=".projetmap",
         )
         _graph_cache[path] = graph_data
 
@@ -94,7 +94,7 @@ def codemap_scan(path: str, refresh: bool = False, behavioral: bool = False) -> 
             bh = run_behavioral_analysis_pipeline(
                 target=path,
                 graph_data=graph_data,
-                output_dir=".codemap",
+                output_dir=".projetmap",
             )
             summary = bh.get("summary", {})
             result["behavioral"] = {
@@ -110,7 +110,7 @@ def codemap_scan(path: str, refresh: bool = False, behavioral: bool = False) -> 
 
 
 @mcp.tool()
-def codemap_report(path: str) -> str:
+def projetmap_report(path: str) -> str:
     """Get the full Markdown report for a scanned codebase.
 
     Args:
@@ -121,13 +121,13 @@ def codemap_report(path: str) -> str:
     if not report_file.exists():
         return json.dumps({
             "status": "error",
-            "error": f"No report found at {report_file}. Run codemap_scan first.",
+            "error": f"No report found at {report_file}. Run projetmap_scan first.",
         })
     return report_file.read_text(encoding="utf-8")
 
 
 @mcp.tool()
-def codemap_query(path: str, entity_name: str) -> str:
+def projetmap_query(path: str, entity_name: str) -> str:
     """Query a specific entity by name. Returns details and relationships.
 
     Args:
@@ -138,7 +138,7 @@ def codemap_query(path: str, entity_name: str) -> str:
     if not data:
         return json.dumps({
             "status": "error",
-            "error": "No cached graph. Run codemap_scan first.",
+            "error": "No cached graph. Run projetmap_scan first.",
         })
 
     entities = {e["id"]: e for e in data.get("entities", [])}
@@ -171,7 +171,7 @@ def codemap_query(path: str, entity_name: str) -> str:
 
 
 @mcp.tool()
-def codemap_path(path: str, source: str, dest: str) -> str:
+def projetmap_path(path: str, source: str, dest: str) -> str:
     """Find the dependency path between two entities.
 
     Args:
@@ -183,7 +183,7 @@ def codemap_path(path: str, source: str, dest: str) -> str:
     if not data:
         return json.dumps({
             "status": "error",
-            "error": "No cached graph. Run codemap_scan first.",
+            "error": "No cached graph. Run projetmap_scan first.",
         })
 
     import networkx as nx
@@ -233,7 +233,7 @@ def codemap_path(path: str, source: str, dest: str) -> str:
 
 
 @mcp.tool()
-def codemap_dead_code(path: str) -> str:
+def projetmap_dead_code(path: str) -> str:
     """Get dead code — functions unreachable from entry points.
 
     Args:
@@ -243,7 +243,7 @@ def codemap_dead_code(path: str) -> str:
     if not bh:
         return json.dumps({
             "status": "error",
-            "error": "No behavioral analysis. Run codemap_scan with behavioral=true.",
+            "error": "No behavioral analysis. Run projetmap_scan with behavioral=true.",
         })
 
     dead = bh.get("dead_code", [])
@@ -255,7 +255,7 @@ def codemap_dead_code(path: str) -> str:
 
 
 @mcp.tool()
-def codemap_hotspots(path: str) -> str:
+def projetmap_hotspots(path: str) -> str:
     """Get state mutation hotspots — classes with the most state changes.
 
     High mutation counts indicate potential architectural risk.
@@ -267,7 +267,7 @@ def codemap_hotspots(path: str) -> str:
     if not bh:
         return json.dumps({
             "status": "error",
-            "error": "No behavioral analysis. Run codemap_scan with behavioral=true.",
+            "error": "No behavioral analysis. Run projetmap_scan with behavioral=true.",
         })
 
     hotspots = bh.get("mutation_hotspots", [])
@@ -279,7 +279,7 @@ def codemap_hotspots(path: str) -> str:
 
 
 @mcp.tool()
-def codemap_listeners(path: str) -> str:
+def projetmap_listeners(path: str) -> str:
     """Get unpaired listener warnings — potential memory leaks.
 
     Components that add listeners without removing them may leak memory.
@@ -291,7 +291,7 @@ def codemap_listeners(path: str) -> str:
     if not bh:
         return json.dumps({
             "status": "error",
-            "error": "No behavioral analysis. Run codemap_scan with behavioral=true.",
+            "error": "No behavioral analysis. Run projetmap_scan with behavioral=true.",
         })
 
     unpaired = bh.get("unpaired_listeners", [])
@@ -307,7 +307,7 @@ def codemap_listeners(path: str) -> str:
 
 
 @mcp.tool()
-def codemap_god_nodes(path: str) -> str:
+def projetmap_god_nodes(path: str) -> str:
     """Get god nodes — most-connected modules (architectural bottlenecks).
 
     These modules have the highest degree centrality and may indicate
@@ -320,7 +320,7 @@ def codemap_god_nodes(path: str) -> str:
     if not data:
         return json.dumps({
             "status": "error",
-            "error": "No cached graph. Run codemap_scan first.",
+            "error": "No cached graph. Run projetmap_scan first.",
         })
 
     god_nodes = data.get("metadata", {}).get("god_nodes", data.get("god_nodes", []))
@@ -335,7 +335,7 @@ def codemap_god_nodes(path: str) -> str:
 
 
 def main():
-    """Run the Codemap MCP server over stdio."""
+    """Run the Projetmap MCP server over stdio."""
     mcp.run(transport="stdio")
 
 

@@ -8,7 +8,7 @@ import pytest
 
 def test_import_cache_functions():
     """Test that cache functions can be imported."""
-    from codemap.core.cache import file_hash, load_cache, save_cache
+    from projetmap.core.cache import file_hash, load_cache, save_cache
 
     assert callable(file_hash)
     assert callable(load_cache)
@@ -17,7 +17,7 @@ def test_import_cache_functions():
 
 def test_file_hash():
     """Test file hash computation."""
-    from codemap.core.cache import file_hash
+    from projetmap.core.cache import file_hash
 
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
         f.write("test content")
@@ -33,7 +33,7 @@ def test_file_hash():
 
 def test_load_cache_empty():
     """Test loading cache from empty directory."""
-    from codemap.core.cache import load_cache
+    from projetmap.core.cache import load_cache
 
     with tempfile.TemporaryDirectory() as tmpdir:
         cache = load_cache(Path(tmpdir))
@@ -42,7 +42,7 @@ def test_load_cache_empty():
 
 def test_save_and_load_cache():
     """Test saving and loading cache."""
-    from codemap.core.cache import load_cache, save_cache
+    from projetmap.core.cache import load_cache, save_cache
 
     with tempfile.TemporaryDirectory() as tmpdir:
         cache_dir = Path(tmpdir)

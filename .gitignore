@@ -38,8 +38,8 @@ htmlcov/
 # Type checking
 .mypy_cache/
 
-# Codemap output (generated, not source)
-.codemap/
+# Projetmap output (generated, not source)
+.projetmap/
 .graphify/
 
 # Dart

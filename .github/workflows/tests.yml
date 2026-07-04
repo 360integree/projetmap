@@ -28,12 +28,12 @@ jobs:
 
       - name: Lint with ruff
         run: |
-          ruff check codemap/
-          ruff format --check codemap/
+          ruff check projetmap/
+          ruff format --check projetmap/
 
       - name: Run tests
         run: |
-          pytest --cov=codemap --cov-report=xml --cov-report=term-missing
+          pytest --cov=projetmap --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'

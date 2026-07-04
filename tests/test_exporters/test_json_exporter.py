@@ -8,14 +8,14 @@ import pytest
 
 def test_import_json_exporter():
     """Test that JSON exporter can be imported."""
-    from codemap.exporters.json_exporter import export_json
+    from projetmap.exporters.json_exporter import export_json
 
     assert callable(export_json)
 
 
 def test_json_exporter_exports_file(tmp_path):
     """Test that export_json creates a JSON file."""
-    from codemap.exporters.json_exporter import export_json
+    from projetmap.exporters.json_exporter import export_json
 
     output_file = tmp_path / "graph.json"
 
@@ -39,7 +39,7 @@ def test_json_exporter_exports_file(tmp_path):
 
 def test_json_exporter_creates_directory(tmp_path):
     """Test that export_json creates parent directories."""
-    from codemap.exporters.json_exporter import export_json
+    from projetmap.exporters.json_exporter import export_json
 
     output_file = tmp_path / "subdir" / "graph.json"
 
