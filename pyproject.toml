@@ -49,9 +49,9 @@ dev = [
 projetmap = "projetmap.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/360integree/codemap"
-Repository = "https://github.com/360integree/codemap"
-Issues = "https://github.com/360integree/codemap/issues"
+Homepage = "https://github.com/360integree/projetmap"
+Repository = "https://github.com/360integree/projetmap"
+Issues = "https://github.com/360integree/projetmap/issues"
 
 [tool.setuptools.packages.find]
 include = ["projetmap*"]

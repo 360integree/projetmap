@@ -3,7 +3,7 @@
 **Knowledge graph generator for codebases.**
 
 [![PyPI version](https://badge.fury.io/py/projetmap.svg)](https://pypi.org/project/projetmap/)
-[![Tests](https://github.com/360integree/codemap/actions/workflows/tests.yml/badge.svg)](https://github.com/360integree/codemap/actions/workflows/tests.yml)
+[![Tests](https://github.com/360integree/projetmap/actions/workflows/tests.yml/badge.svg)](https://github.com/360integree/projetmap/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
@@ -20,7 +20,7 @@ pip install projetmap
 ### Or install from source
 
 ```bash
-git clone https://github.com/360integree/codemap.git
+git clone https://github.com/360integree/projetmap.git
 cd codemap
 pip install -e ".[full]"
 ```
@@ -192,7 +192,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 ### Quick Start (Development)
 
 ```bash
-git clone https://github.com/360integree/codemap.git
+git clone https://github.com/360integree/projetmap.git
 cd codemap
 python -m venv .venv
 source .venv/bin/activate
