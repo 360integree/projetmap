@@ -33,8 +33,10 @@ def export_html(graph_data: dict, output_path: Path) -> Path:
             type_groups[t] = []
         type_groups[t].append(e)
 
-    # Build cluster nodes
+    # Build cluster nodes — prefer algorithmic community data over type-based grouping
+    community_clusters = graph_data.get("clusters", [])
     cluster_nodes = []
+
     for g in god_nodes:
         cluster_nodes.append({
             "id": _esc(g["id"]),
@@ -46,32 +48,68 @@ def export_html(graph_data: dict, output_path: Path) -> Path:
             "cluster": None,
         })
 
-    for t, ents in type_groups.items():
-        if t in ("module", "config"):
-            continue
-        cid = f"cluster_{t}"
-        cluster_nodes.append({
-            "id": cid,
-            "name": f"{t} ({len(ents)})",
-            "type": "cluster",
-            "entityType": t,
-            "file": f"{len(ents)} entities",
-            "size": 14 + min(len(ents) // 20, 12),
-            "shape": "dot",
-            "cluster": None,
-        })
+    if community_clusters:
+        # Use algorithmic community detection results (Leiden / greedy modularity / path-based)
+        for comm in community_clusters:
+            cid = comm["id"]
+            name = comm.get("name", cid)
+            member_count = len(comm.get("members", []))
+            cluster_nodes.append({
+                "id": cid,
+                "name": f"{name} ({member_count})",
+                "type": "cluster",
+                "entityType": cid,
+                "file": f"{member_count} entities",
+                "size": 14 + min(member_count // 20, 12),
+                "shape": "dot",
+                "cluster": None,
+                "members": comm.get("members", []),
+            })
+    else:
+        # Fallback: group by entity type
+        for t, ents in type_groups.items():
+            if t == "module":
+                continue
+            cid = f"cluster_{t}"
+            cluster_nodes.append({
+                "id": cid,
+                "name": f"{t} ({len(ents)})",
+                "type": "cluster",
+                "entityType": t,
+                "file": f"{len(ents)} entities",
+                "size": 14 + min(len(ents) // 20, 12),
+                "shape": "dot",
+                "cluster": None,
+            })
 
     # Map entities to clusters
     ent_to_cluster = {}
-    for e in entities:
-        eid = _esc(e["id"])
-        t = e.get("type", "unknown")
-        if eid in god_ids:
+    if community_clusters:
+        # Build reverse lookup: entity_id → cluster_id from community data
+        for comm in community_clusters:
+            cid = comm["id"]
+            for member_id in comm.get("members", []):
+                eid = _esc(member_id)
+                ent_to_cluster[eid] = cid
+        # God nodes always map to themselves
+        for g in god_nodes:
+            eid = _esc(g["id"])
             ent_to_cluster[eid] = eid
-        elif t not in ("module", "config"):
-            ent_to_cluster[eid] = f"cluster_{t}"
-        else:
-            ent_to_cluster[eid] = None
+        # Entities not in any community: unmapped (no cluster node exists for them)
+        for e in entities:
+            eid = _esc(e["id"])
+            if eid not in ent_to_cluster:
+                ent_to_cluster[eid] = None
+    else:
+        for e in entities:
+            eid = _esc(e["id"])
+            t = e.get("type", "unknown")
+            if eid in god_ids:
+                ent_to_cluster[eid] = eid
+            elif t != "module":
+                ent_to_cluster[eid] = f"cluster_{t}"
+            else:
+                ent_to_cluster[eid] = None
 
     # Aggregate edges between clusters
     cluster_edge_counts = {}
@@ -106,36 +144,66 @@ def export_html(graph_data: dict, output_path: Path) -> Path:
 
     # Prepare member data for drill-down
     member_data = {}
-    for t, ents in type_groups.items():
-        if t in ("module", "config"):
-            continue
-        members = []
-        for e in ents[:80]:
-            eid = _esc(e["id"])
-            members.append({
-                "id": eid,
-                "name": e.get("name", eid),
-                "type": e.get("type", "unknown"),
-                "file": e.get("file", ""),
-                "size": 6,
-                "shape": "diamond" if eid in god_ids else "dot",
-            })
-        # Add edges between members
-        member_edges = []
-        for r in relationships:
-            src = _esc(r["source"])
-            tgt = _esc(r["target"])
-            src_ent = entity_map.get(src)
-            tgt_ent = entity_map.get(tgt)
-            if src_ent and tgt_ent:
-                if src_ent.get("type") == t or tgt_ent.get("type") == t:
-                    if src != tgt:
-                        member_edges.append({
-                            "source": src,
-                            "target": tgt,
-                            "type": r.get("type", ""),
-                        })
-        member_data[t] = {"nodes": members, "edges": member_edges[:100]}
+    if community_clusters:
+        # Community-based drill-down: show members of each community
+        for comm in community_clusters:
+            cid = comm["id"]
+            member_ids = comm.get("members", [])
+            member_set = {_esc(mid) for mid in member_ids}
+            members = []
+            for mid in member_ids:
+                eid = _esc(mid)
+                ent = entity_map.get(eid, {})
+                members.append({
+                    "id": eid,
+                    "name": ent.get("name", mid),
+                    "type": ent.get("type", "unknown"),
+                    "file": ent.get("file", ""),
+                    "size": 6,
+                    "shape": "diamond" if eid in god_ids else "dot",
+                })
+            member_edges = []
+            for r in relationships:
+                src = _esc(r["source"])
+                tgt = _esc(r["target"])
+                if src in member_set and tgt in member_set and src != tgt:
+                    member_edges.append({
+                        "source": src,
+                        "target": tgt,
+                        "type": r.get("type", ""),
+                    })
+            member_data[cid] = {"nodes": members[:80], "edges": member_edges[:100]}
+    else:
+        # Type-based drill-down fallback
+        for t, ents in type_groups.items():
+            if t == "module":
+                continue
+            members = []
+            for e in ents[:80]:
+                eid = _esc(e["id"])
+                members.append({
+                    "id": eid,
+                    "name": e.get("name", eid),
+                    "type": e.get("type", "unknown"),
+                    "file": e.get("file", ""),
+                    "size": 6,
+                    "shape": "diamond" if eid in god_ids else "dot",
+                })
+            member_edges = []
+            for r in relationships:
+                src = _esc(r["source"])
+                tgt = _esc(r["target"])
+                src_ent = entity_map.get(src)
+                tgt_ent = entity_map.get(tgt)
+                if src_ent and tgt_ent:
+                    if src_ent.get("type") == t or tgt_ent.get("type") == t:
+                        if src != tgt:
+                            member_edges.append({
+                                "source": src,
+                                "target": tgt,
+                                "type": r.get("type", ""),
+                            })
+            member_data[t] = {"nodes": members, "edges": member_edges[:100]}
 
     vis_js = Path("/tmp/vis-network.min.js").read_text()
 
@@ -189,13 +257,15 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
 <div id="graph"></div>
 <div id="status">Loading...</div>
 <div id="legend">
-  <div class="item"><div class="dot" style="background:#58a6ff"></div> Module</div>
   <div class="item"><div class="dot" style="background:#3fb950"></div> Class</div>
   <div class="item"><div class="dot" style="background:#d2a8ff"></div> Function</div>
   <div class="item"><div class="dot" style="background:#f0883e"></div> Route</div>
   <div class="item"><div class="dot" style="background:#f778ba"></div> Schema</div>
+  <div class="item"><div class="dot" style="background:#ffa657"></div> Enum</div>
+  <div class="item"><div class="dot" style="background:#8b949e"></div> Config</div>
+  <div class="item"><div class="dot" style="background:#1f6feb"></div> Cluster</div>
   <div class="item"><div class="diamond"></div> God Node</div>
-  <div class="item" style="color:#58a6ff">Click cluster to drill down</div>
+  <div class="item" style="color:#1f6feb">Click cluster to drill down</div>
 </div>
 <div id="info">
   <h3 id="info-title"></h3>
@@ -216,7 +286,7 @@ const allRelationships = {json.dumps([{"source": _esc(r["source"]), "target": _e
 const colors = {{
   module: '#58a6ff', class: '#3fb950', function: '#d2a8ff',
   route: '#f0883e', schema: '#f778ba', config: '#8b949e',
-  god: '#ffd700', cluster: '#58a6ff', enum: '#ffa657', mixin: '#79c0ff'
+  god: '#ffd700', cluster: '#1f6feb', enum: '#ffa657', mixin: '#79c0ff'
 }};
 
 const container = document.getElementById('graph');
@@ -244,7 +314,7 @@ function makeEdges(items) {{
     to: r.target,
     label: r.label || r.type || '',
     width: r.width || 1,
-    color: {{ color: '#21262d', highlight: '#58a6ff', opacity: 0.6 }},
+    color: {{ color: '#30363d', highlight: '#58a6ff', opacity: 0.8 }},
     font: {{ size: 8, color: '#58a6ff', strokeWidth: 0 }},
     arrows: {{ to: {{ enabled: true, scaleFactor: 0.4 }} }},
     smooth: {{ type: 'curvedCW', roundness: 0.15 }}
@@ -268,8 +338,7 @@ function initGraph(nodeData, edgeData, opts = {{}}) {{
       }},
       stabilization: {{ iterations: 60, fit: true }}
     }},
-    interaction: {{ hover: true, tooltipDelay: 80, zoomView: true, dragView: true }},
-    edges: {{ smooth: false }}
+    interaction: {{ hover: true, tooltipDelay: 80, zoomView: true, dragView: true }}
   }});
   window.network = network;
 
