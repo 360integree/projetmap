@@ -1,0 +1,7 @@
+#!/bin/bash
+# projetmap — wrapper script for the Projetmap knowledge graph tool
+# Install: chmod +x ~/.agents/skills/projetmap/bin/projetmap
+# Usage:  projetmap . [--refresh] [--query ENTITY] [--path A B]
+
+PROJETMAP_HOME="$HOME/.agents/skills/projetmap"
+exec python3 "$PROJETMAP_HOME/scripts/projetmap.py" "$@"

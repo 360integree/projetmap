@@ -134,43 +134,78 @@ Projetmap includes an MCP server that AI agents in IDEs can call natively.
 projetmap mcp
 ```
 
-### IDE Configuration
+### Auto-Install MCP Config
 
-**Cursor** — add to `.cursor/mcp.json`:
+```bash
+# Auto-detect IDE and install MCP config
+projetmap --install-mcp
+
+# Or specify IDE explicitly
+projetmap --install-mcp cursor
+projetmap --install-mcp claude
+projetmap --install-mcp windsurf
+projetmap --install-mcp zcode
+```
+
+### Uninstall MCP Config
+
+```bash
+projetmap --uninstall-mcp
+# Or: projetmap --uninstall-mcp claude
+```
+
+## ZCode Skill (AI Agent Integration)
+
+Projetmap includes a skill for ZCode and other AI agent platforms.
+
+### Install Skill (after pip install)
+
+```bash
+projetmap --install-skill
+```
+
+This copies the skill files to `~/.agents/skills/projetmap/` for use with ZCode.
+
+### Usage in ZCode
+
+```
+/projetmap /path/to/project           # Scan project
+/projetmap /path/to/project --journeys # Scan with user journeys
+```
+
+### Alternative: Manual Installation
+
+```bash
+git clone https://github.com/360integree/projetmap.git ~/.agents/skills/projetmap
+chmod +x ~/.agents/skills/projetmap/bin/projetmap
+```
+
+### Uninstall Skill
+
+```bash
+projetmap --uninstall-skill
+```
+
+This removes the skill files from `~/.agents/skills/projetmap/`.
+
+### Manual Configuration (if needed)
+
+Add to your IDE's MCP config file:
 ```json
 {
   "mcpServers": {
     "projetmap": {
-      "command": "projetmap",
-      "args": ["mcp"]
+      "command": "/path/to/python",
+      "args": ["-m", "projetmap", "mcp"],
+      "env": {
+        "PYTHONPATH": "/path/to/projetmap"
+      }
     }
   }
 }
 ```
 
-**Claude Desktop** — add to `claude_desktop_config.json`:
-```json
-{
-  "mcpServers": {
-    "projetmap": {
-      "command": "projetmap",
-      "args": ["mcp"]
-    }
-  }
-}
-```
-
-**Windsurf** — add to your MCP configuration:
-```json
-{
-  "mcpServers": {
-    "projetmap": {
-      "command": "projetmap",
-      "args": ["mcp"]
-    }
-  }
-}
-```
+> Config file locations: Cursor (`~/.cursor/mcp.json`), Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json`), Windsurf (`~/.codeium/windsurf/mcp.json`), ZCode (`~/.zcode/mcp.json`)
 
 ### MCP Tools
 
@@ -208,6 +243,32 @@ pytest
 - leidenalg ≥ 0.10.0 (optional, falls back to greedy modularity)
 - mcp ≥ 1.0.0 (for MCP server / IDE integration)
 - Dart SDK (only for Dart behavioral analysis)
+
+## Uninstall
+
+### Full uninstall (recommended)
+
+```bash
+projetmap --uninstall
+```
+
+Removes skill files, MCP configs from all IDEs, and prompts to pip uninstall.
+
+### Partial uninstall
+
+```bash
+projetmap --uninstall-skill     # Remove skill files only
+projetmap --uninstall-mcp       # Remove MCP config only
+pip uninstall projetmap         # Remove package only
+```
+
+### Remove output files
+
+Delete the `.projetmap/` directory in any scanned project:
+
+```bash
+rm -rf .projetmap/
+```
 
 ## License
 

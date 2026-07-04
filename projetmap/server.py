@@ -60,7 +60,8 @@ def _load_behavioral(path: str) -> dict | None:
 
 
 @mcp.tool()
-def projetmap_scan(path: str, refresh: bool = False, behavioral: bool = False) -> str:
+def projetmap_scan(path: str, refresh: bool = False, behavioral: bool = False,
+                   journeys: bool = False) -> str:
     """Scan a codebase and build a knowledge graph.
 
     Run this first to initialize the graph for a project.
@@ -70,8 +71,13 @@ def projetmap_scan(path: str, refresh: bool = False, behavioral: bool = False) -
         path: Absolute path to the project root.
         refresh: Force re-scan even if cache exists.
         behavioral: Also run behavioral analysis (dead code, state flow).
+        journeys: Also run user journey detection (UI flows, handlers, navigation).
     """
-    from projetmap.cli import run_behavioral_analysis_pipeline, run_pipeline
+    from projetmap.cli import (
+        run_behavioral_analysis_pipeline,
+        run_journey_analysis,
+        run_pipeline,
+    )
 
     try:
         graph_data = run_pipeline(
@@ -102,6 +108,18 @@ def projetmap_scan(path: str, refresh: bool = False, behavioral: bool = False) -
                 "hot_paths": summary.get("hot_paths", 0),
                 "state_mutations": summary.get("total_state_mutations", 0),
                 "unpaired_listeners": summary.get("unpaired_listeners", 0),
+            }
+
+        if journeys:
+            jh = run_journey_analysis(
+                target=path,
+                graph_data=graph_data,
+                output_dir=".projetmap",
+            )
+            j_summary = jh.get("summary", {})
+            result["journeys"] = {
+                "total": j_summary.get("total_journeys", 0),
+                "features": len(j_summary.get("by_feature", {})),
             }
 
         return json.dumps(result, indent=2)
@@ -328,6 +346,45 @@ def projetmap_god_nodes(path: str) -> str:
         "status": "ok",
         "count": len(god_nodes),
         "god_nodes": god_nodes[:10],
+    }, indent=2)
+
+
+@mcp.tool()
+def projetmap_journeys(path: str, feature: str = None) -> str:
+    """Get user journeys — traceable paths through the app triggered by user actions.
+
+    Shows how users interact with the application: from screens/pages,
+    through event handlers, to services and data operations.
+
+    Args:
+        path: Absolute path to the project root.
+        feature: Optional feature filter (e.g., "checkout", "auth").
+    """
+    out = _get_out_dir(path)
+    journey_file = out / "user_journeys.json"
+    if not journey_file.exists():
+        return json.dumps({
+            "status": "error",
+            "error": "No journey analysis found. Run projetmap_scan with journeys=true.",
+        })
+
+    with open(journey_file) as f:
+        data = json.load(f)
+
+    journeys = data.get("journeys", [])
+
+    if feature:
+        journeys = [
+            j for j in journeys
+            if feature.lower() in j.get("feature", "").lower()
+            or feature.lower() in j.get("name", "").lower()
+        ]
+
+    return json.dumps({
+        "status": "ok",
+        "count": len(journeys),
+        "journeys": journeys[:20],
+        "summary": data.get("summary", {}),
     }, indent=2)
 
 

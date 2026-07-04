@@ -56,6 +56,9 @@ Issues = "https://github.com/360integree/projetmap/issues"
 [tool.setuptools.packages.find]
 include = ["projetmap*"]
 
+[tool.setuptools.package-data]
+projetmap = ["skill/*", "skill/bin/*"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"
