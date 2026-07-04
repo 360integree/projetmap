@@ -44,7 +44,7 @@ def _run_dart_extractor(root: Path, output_path: str) -> bool:
             ["dart", "run", str(extractor_script), str(root), output_path],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=300,
             cwd=str(extractor_dir),
         )
         if result.returncode != 0:
@@ -56,7 +56,7 @@ def _run_dart_extractor(root: Path, output_path: str) -> bool:
         print("  ❌ 'dart' command not found. Ensure Dart SDK is in PATH.")
         return False
     except subprocess.TimeoutExpired:
-        print("  ❌ Dart extractor timed out (120s limit).")
+        print("  ❌ Dart extractor timed out (300s limit).")
         return False
 
 
